@@ -16,8 +16,6 @@ namespace Kontur
     /// </summary>
     public partial class MainWindow : Window
     {
-        //отключаю кнопку с заполнением основных данных, чтобы нельзя было это выполнить до заполнения вспомогательных таблиц
-        //при заполнении вспомогательных становится активной, при очищении таблиц не активной
         public MainWindow()
         {
             InitializeComponent();
@@ -28,6 +26,7 @@ namespace Kontur
         {
             Class1 class1 = new Class1();
             class1.Read();
+            table.IsEnabled = false;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -41,7 +40,6 @@ namespace Kontur
         {
             Class1 class1 = new Class1();
             class1.Remove();
-            table.IsEnabled = false;
         }
     }
 }
