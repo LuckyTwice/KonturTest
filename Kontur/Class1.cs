@@ -34,29 +34,38 @@ namespace Kontur
             }
             MessageBox.Show("Данные очищены");
         }
+        //метод для заполнения вспомогательных таблиц
         public void Write()
         {
+            //настраиваем разделитель дял будущего чтения файла
             var config = new CsvConfiguration(CultureInfo.InvariantCulture);
             config.Delimiter = ";";
+
+            //подключение поставщика кодировок, который включает в себя windows-1251
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             var enc1251 = Encoding.GetEncoding(1251);
+
             using (var reader = new StreamReader(test, enc1251))
             {
                 using (var csv = new CsvReader(reader, config))
                 {
+                    //чтение и запоминание заголовков
                     csv.Read();
                     csv.ReadHeader();
+                    //создание списков для запоминания кодов и имен, а также категорий
                     var codelist = new List<Code>();
-                    List<string> dep = new List<string>();
+                    List<string> cat = new List<string>();
+
                     using (var db = new KonturContext())
                     {
+                        //чтение построчно и внесение данных в базу
                         while (csv.Read())
                         {
                             string category = csv.GetField<string>("Категория процесса");
                             string code = csv.GetField<string>("Код процесса");
                             string name = csv.GetField<string>("Наименование процесса");
                             string department = csv.GetField<string>("Подразделение-владелец процесса");
-                            dep.Add(category);
+                            cat.Add(category);
                             codelist.Add(new Code
                             {
                                 Code1 = code,
@@ -84,12 +93,13 @@ namespace Kontur
                             }
                         }
                         int k = 0;
+                        //сапостовление кодов с категориями и внсеение их в базу
                         foreach(var cd in codelist)
                         {
                             var prov1 = db.Codes.SingleOrDefault(c => c.Code1 == cd.Code1);
                             if (prov1 == null)
                             {
-                                int dd = db.Categories.Where(c => c.Name == dep[k]).Select(c => c.Id).Single();
+                                int dd = db.Categories.Where(c => c.Name == cat[k]).Select(c => c.Id).Single();
                                 cd.CatId = dd;
                                 db.Codes.Add(cd);
                                 db.SaveChanges();
@@ -101,6 +111,7 @@ namespace Kontur
                 MessageBox.Show("Вспомогательные данные добавлены");
             }
         }
+        //метод для заполнения основной таблицы
         public void Read()
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture);

@@ -16,6 +16,8 @@ namespace Kontur
     /// </summary>
     public partial class MainWindow : Window
     {
+        //отключаю кнопку с заполнением основных данных, чтобы нельзя было это выполнить до заполнения вспомогательных таблиц
+        //при заполнении вспомогательных становится активной, при очищении таблиц не активной
         public MainWindow()
         {
             InitializeComponent();
